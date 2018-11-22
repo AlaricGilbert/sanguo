@@ -12,42 +12,37 @@ namespace Sanguo.HubServer
     {
         static void Main(string[] args)
         {
-            SocketServer server = new SocketServer(2003);
-            
-            server.DataReceived += (sender, s) =>
+            IOCPServer server = new IOCPServer(8088, 1000);
+            server.DataReceived += (sender, e) =>
             {
-                string str = Encoding.Default.GetString(s);
-                Request r = JsonConvert.DeserializeObject<Request>(str);
-                Console.WriteLine(str);
-                sender.ConnectSocket.Send(Encoding.Default.GetBytes("D"));
-                sender.GetSendSocket().Send(Encoding.Default.GetBytes("D"));
-                if (r.RequestMessage == HandshakeRequest.MagicMessage)
-                    JsonConvert.DeserializeObject<HandshakeRequest>(str).Handle(sender.GetSendSocket());
+                byte[] data = new byte[e.BytesTransferred];
+                Array.Copy(e.Buffer, e.Offset, data, 0, data.Length);
+
+                string info = Encoding.Default.GetString(data);
+                //Log4Debug(String.Format("收到 {0} 数据为 {1}", s.RemoteEndPoint.ToString(), info));
+                Console.WriteLine("server got:{0}",info);
+                Socket s = e.UserToken as Socket;
+                SocketAsyncEventArgs a = new SocketAsyncEventArgs();
+                a.SetBuffer(data, 0, data.Length);
+                s.SendAsync(a);
+                
             };
-            server.StartListen();
+            server.Init();
+            server.Start();
+            IPAddress local = IPAddress.Parse("127.0.0.1");
 
+            IOCPClient client = new IOCPClient(local,8088);
+            client.DataReceived += (sender, e) => {
+                byte[] data = new byte[e.BytesTransferred];
+                Array.Copy(e.Buffer, e.Offset, data, 0, data.Length);
+                string info = Encoding.Default.GetString(data);
+                Console.WriteLine("client got:{0}",info);
+            };
+            client.Connect();
+            client.Listen();
 
+            client.Send(Encoding.Default.GetBytes("dsa"));            
 
-
-
-            for (int i = 0; i < 10; i++)
-            {
-                Socket client = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                try
-                {
-                    client.Connect(new IPEndPoint(IPAddress.Parse("127.0.0.1"), 2003));
-                    string json = JsonConvert.SerializeObject(HandshakeRequest.Default);
-
-                    client.Send(Encoding.Default.GetBytes(json));
-                    byte[] buffer = new byte[2048];
-                    client.Receive(buffer);
-                    Console.WriteLine(Encoding.Default.GetString(buffer));
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
             while (true) { }
         }
     }
