@@ -118,7 +118,7 @@ namespace Sanguo.Core.Communication
         {
             try
             {
-                int index = ((Receive_SAEAUToken)args.UserToken).BufferIndex;
+                int index = ((ReceiveSAEAUToken)args.UserToken).BufferIndex;
                 if (index >= 0)
                     _availableBufferIndexPool.Push(index);
             }
@@ -127,40 +127,6 @@ namespace Sanguo.Core.Communication
                 Console.WriteLine(e);
             }
 
-        }
-        #endregion
-
-        #region Receive SocketAsyncEventArgs UserToken
-
-        /// <summary>
-        /// Represents the user token of a SocketAsyncEventArgs of a receive socket.
-        /// </summary>
-        class Receive_SAEAUToken
-        {
-            /// <summary>
-            /// The assigned buffer region index.
-            /// </summary>
-            public int BufferIndex { get; set; } = -1;
-
-            /// <summary>
-            /// Universial Unique IDentity.
-            /// </summary>
-            public string UUID { get; } = Guid.NewGuid().ToString();
-
-            /// <summary>
-            /// The time that the client sent heartbeat package.
-            /// </summary>
-            public DateTime HeartbeatTime { get; set; }
-
-            /// <summary>
-            /// The socket which receives the message.
-            /// </summary>
-            public Socket Socket { get; set; }
-
-            /// <summary>
-            /// The correspond message sender's SocketAsyncEventArgs.
-            /// </summary>
-            public SocketAsyncEventArgs SenderSAEA { get; set; }
         }
         #endregion
 
@@ -188,7 +154,7 @@ namespace Sanguo.Core.Communication
                 SocketAsyncEventArgs saea = new SocketAsyncEventArgs();
                 saea.Completed += new EventHandler<SocketAsyncEventArgs>(OnIOCompleted);
                 AssignBuffer(saea);
-                Receive_SAEAUToken userToken = new Receive_SAEAUToken();
+                ReceiveSAEAUToken userToken = new ReceiveSAEAUToken();
                 SocketAsyncEventArgs senderSAEA = new SocketAsyncEventArgs();
                 senderSAEA.Completed += new EventHandler<SocketAsyncEventArgs>(OnIOCompleted);
                 userToken.SenderSAEA = senderSAEA;
@@ -283,7 +249,7 @@ namespace Sanguo.Core.Communication
                     _occupiedSAEAPool.Add(saea_Receive);
                     if (saea_Receive != null)
                     {
-                        Receive_SAEAUToken userToken = (Receive_SAEAUToken)saea_Receive.UserToken;
+                        ReceiveSAEAUToken userToken = (ReceiveSAEAUToken)saea_Receive.UserToken;
                         userToken.Socket = s;
 
                         if (!userToken.Socket.ReceiveAsync(saea_Receive))
@@ -308,14 +274,14 @@ namespace Sanguo.Core.Communication
             {
                 if (e.BytesTransferred > 0 && e.SocketError == SocketError.Success)
                 {
-                    Receive_SAEAUToken userToken = (Receive_SAEAUToken)e.UserToken;
+                    ReceiveSAEAUToken userToken = (ReceiveSAEAUToken)e.UserToken;
                     userToken.HeartbeatTime = DateTime.Now;
 
                     if (DataReceived != null)
                     {
                         byte[] receivedData = new byte[e.BytesTransferred];
                         Array.Copy(e.Buffer, e.Offset, receivedData, 0, e.BytesTransferred);
-                        DataReceived(receivedData);
+                        DataReceived(e, receivedData);
                     }
                     if (!userToken.Socket.ReceiveAsync(e))
                         ProcessReceive(e);
@@ -340,7 +306,7 @@ namespace Sanguo.Core.Communication
         {
             try
             {
-                Receive_SAEAUToken userToken = (Receive_SAEAUToken)saea.UserToken;
+                ReceiveSAEAUToken userToken = (ReceiveSAEAUToken)saea.UserToken;
                 _occupiedSAEAPool.Remove(saea);
                 _availableSAEAPool.Add(saea);
                 if (userToken.Socket != null)
@@ -367,8 +333,8 @@ namespace Sanguo.Core.Communication
                     {
                         foreach (SocketAsyncEventArgs saea in _occupiedSAEAPool)
                         {
-                            Receive_SAEAUToken userToken = (Receive_SAEAUToken)saea.UserToken;
-                            if (((Receive_SAEAUToken)saea.UserToken).HeartbeatTime.
+                            ReceiveSAEAUToken userToken = (ReceiveSAEAUToken)saea.UserToken;
+                            if (((ReceiveSAEAUToken)saea.UserToken).HeartbeatTime.
                                 AddMilliseconds(HeartbeatInterval).CompareTo(DateTime.Now) < 0)
                                 userToken.Socket?.Close();
                         }
@@ -380,7 +346,7 @@ namespace Sanguo.Core.Communication
         #endregion
 
         #region Callback
-        public delegate void DataReceivedHandler(byte[] data);
+        public delegate void DataReceivedHandler(SocketAsyncEventArgs sender, byte[] data);
         public event DataReceivedHandler DataReceived;
         #endregion
     }
