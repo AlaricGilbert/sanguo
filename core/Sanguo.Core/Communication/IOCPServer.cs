@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Sockets;
 using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
 namespace Sanguo.Core.Communication
@@ -13,25 +11,29 @@ namespace Sanguo.Core.Communication
     /// </summary>
     public class IOCPServer : IDisposable
     {
+        /// <summary>
+        /// Pre-alloc buffers for send and receive.
+        /// </summary>
         const int opsToPreAlloc = 2;
+
         #region Fields
         /// <summary>
-        /// 服务器程序允许的最大客户端连接数
+        /// The maximum numbers of client that can simultaneously connect to this server.
         /// </summary>
         private int _maxClient;
 
         /// <summary>
-        /// 监听Socket，用于接受客户端的连接请求
+        /// The listening socket, which is used to process the connection request.
         /// </summary>
         private Socket _serverSock;
 
         /// <summary>
-        /// 当前的连接的客户端数
+        /// The number of the clients that is connected to this server.
         /// </summary>
         private int _clientCount;
 
         /// <summary>
-        /// 用于每个I/O Socket操作的缓冲区大小
+        /// The size of the buffer of each I/O socket.
         /// </summary>
         private int _bufferSize = 1024;
 
@@ -73,6 +75,7 @@ namespace Sanguo.Core.Communication
         /// </summary>
         public Encoding Encoding { get; set; }
 
+        public int ClientCount { get { return _clientCount; } }
         #endregion
 
         #region Ctors
@@ -122,7 +125,6 @@ namespace Sanguo.Core.Communication
 
         #endregion
 
-
         #region 初始化
 
         /// <summary>
@@ -141,7 +143,21 @@ namespace Sanguo.Core.Communication
             {
                 //Pre-allocate a set of reusable SocketAsyncEventArgs
                 readWriteEventArg = new SocketAsyncEventArgs();
-                readWriteEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(OnIOCompleted);
+                readWriteEventArg.Completed += (sender, e) =>
+                {
+                    // Determine which type of operation just completed and call the associated handler.
+                    switch (e.LastOperation)
+                    {
+                        case SocketAsyncOperation.Accept:
+                            ProcessAccept(e);
+                            break;
+                        case SocketAsyncOperation.Receive:
+                            ProcessReceive(e);
+                            break;
+                        default:
+                            throw new ArgumentException("The last operation completed on the socket was not a receive or send");
+                    }
+                };
                 readWriteEventArg.UserToken = null;
 
                 // assign a byte buffer from the buffer pool to the SocketAsyncEventArg object
@@ -150,7 +166,6 @@ namespace Sanguo.Core.Communication
                 // add SocketAsyncEventArg to the pool
                 _objectPool.Push(readWriteEventArg);
             }
-
         }
 
         #endregion
@@ -206,8 +221,7 @@ namespace Sanguo.Core.Communication
         }
 
         #endregion
-
-
+        
         #region Accept
 
         /// <summary>
@@ -261,20 +275,16 @@ namespace Sanguo.Core.Communication
                         Interlocked.Increment(ref _clientCount);//原子操作加1
                         SocketAsyncEventArgs asyniar = _objectPool.Pop();
                         asyniar.UserToken = s;
-
-                        Log4Debug(String.Format("客户 {0} 连入, 共有 {1} 个连接。", s.RemoteEndPoint.ToString(), _clientCount));
-
+                        ClientConnected?.Invoke(this, e);
                         if (!s.ReceiveAsync(asyniar))//投递接收请求
                         {
                             ProcessReceive(asyniar);
                         }
                     }
-                    catch (SocketException ex)
+                    catch (SocketException)
                     {
-                        Log4Debug(String.Format("接收客户 {0} 数据出错, 异常信息： {1} 。", s.RemoteEndPoint, ex.ToString()));
-                        //TODO 异常处理
+
                     }
-                    //投递下一个接受请求
                     StartAccept(e);
                 }
             }
@@ -348,12 +358,12 @@ namespace Sanguo.Core.Communication
         /// <param name="e">与接收完成操作相关联的SocketAsyncEventArg对象</param>
         private void ProcessReceive(SocketAsyncEventArgs e)
         {
+            Socket s = (Socket)e.UserToken;
             if (e.SocketError == SocketError.Success)//if (e.BytesTransferred > 0 && e.SocketError == SocketError.Success)
             {
                 // 检查远程主机是否关闭连接
                 if (e.BytesTransferred > 0)
                 {
-                    Socket s = (Socket)e.UserToken;
                     //判断所有需接收的数据是否已经完成
                     if (s.Available == 0)
                         DataReceived?.Invoke(this, e);
@@ -364,72 +374,16 @@ namespace Sanguo.Core.Communication
             }
             else
             {
-                CloseClientSocket(e);
-            }
-        }
-
-        #endregion
-
-        #region 回调函数
-
-        /// <summary>
-        /// 当Socket上的发送或接收请求被完成时，调用此函数
-        /// </summary>
-        /// <param name="sender">激发事件的对象</param>
-        /// <param name="e">与发送或接收完成操作相关联的SocketAsyncEventArg对象</param>
-        private void OnIOCompleted(object sender, SocketAsyncEventArgs e)
-        {
-            // Determine which type of operation just completed and call the associated handler.
-            switch (e.LastOperation)
-            {
-                case SocketAsyncOperation.Accept:
-                    ProcessAccept(e);
-                    break;
-                case SocketAsyncOperation.Receive:
-                    ProcessReceive(e);
-                    break;
-                default:
-                    throw new ArgumentException("The last operation completed on the socket was not a receive or send");
-            }
-        }
-
-        #endregion
-
-        #region Close
-        /// <summary>
-        /// 关闭socket连接
-        /// </summary>
-        /// <param name="e">SocketAsyncEventArg associated with the completed send/receive operation.</param>
-        private void CloseClientSocket(SocketAsyncEventArgs e)
-        {
-            Log4Debug(String.Format("客户 {0} 断开连接!", ((Socket)e.UserToken).RemoteEndPoint.ToString()));
-            Socket s = e.UserToken as Socket;
-            CloseClientSocket(s, e);
-        }
-
-        /// <summary>
-        /// 关闭socket连接
-        /// </summary>
-        /// <param name="s"></param>
-        /// <param name="e"></param>
-        private void CloseClientSocket(Socket s, SocketAsyncEventArgs e)
-        {
-            try
-            {
+                
+                ClientDisconnected?.Invoke(this, e);
                 s.Shutdown(SocketShutdown.Send);
-            }
-            catch (Exception)
-            {
-                // Throw if client has closed, so it is not necessary to catch.
-            }
-            finally
-            {
                 s.Close();
+                Interlocked.Decrement(ref _clientCount);
+                _maxAcceptedClients.Release();
+                _objectPool.Push(e);//SocketAsyncEventArg 对象被释放，压入可重用队列。
             }
-            Interlocked.Decrement(ref _clientCount);
-            _maxAcceptedClients.Release();
-            _objectPool.Push(e);//SocketAsyncEventArg 对象被释放，压入可重用队列。
         }
+
         #endregion
 
         #region Dispose
@@ -463,22 +417,18 @@ namespace Sanguo.Core.Communication
                             _serverSock = null;
                         }
                     }
-                    catch (SocketException ex)
+                    catch (SocketException)
                     {
-                        //TODO 事件
                     }
                 }
                 disposed = true;
             }
         }
         #endregion
-
-        public void Log4Debug(string msg)
-        {
-            Console.WriteLine("notice:" + msg);
-        }
-
+        
         public event EventHandler<SocketAsyncEventArgs> DataReceived;
         public event EventHandler<SocketAsyncEventArgs> DataSent;
+        public event EventHandler<SocketAsyncEventArgs> ClientConnected;
+        public event EventHandler<SocketAsyncEventArgs> ClientDisconnected;
     }
 }

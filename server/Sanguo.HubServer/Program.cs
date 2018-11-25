@@ -3,8 +3,7 @@ using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Newtonsoft.Json;
-using Sanguo.HubServer.Protocol;
+using System.Threading;
 
 namespace Sanguo.HubServer
 {
@@ -12,38 +11,31 @@ namespace Sanguo.HubServer
     {
         static void Main(string[] args)
         {
-            IOCPServer server = new IOCPServer(8088, 1000);
+
+            IOCPServer server = new IOCPServer(8088, 10000);
             server.DataReceived += (sender, e) =>
             {
-                byte[] data = new byte[e.BytesTransferred];
-                Array.Copy(e.Buffer, e.Offset, data, 0, data.Length);
-
-                string info = Encoding.Default.GetString(data);
-                //Log4Debug(String.Format("收到 {0} 数据为 {1}", s.RemoteEndPoint.ToString(), info));
-                Console.WriteLine("server got:{0}",info);
-                Socket s = e.UserToken as Socket;
-                SocketAsyncEventArgs a = new SocketAsyncEventArgs();
-                a.SetBuffer(data, 0, data.Length);
-                s.SendAsync(a);
-                
+                string info = e.GetReceived();
+                //Console.WriteLine("server got:{0}",info);
+                ((IOCPServer)sender).Send(e, Encoding.Default.GetBytes(info));
             };
             server.Init();
             server.Start();
-            IPAddress local = IPAddress.Parse("127.0.0.1");
-
-            IOCPClient client = new IOCPClient(local,8088);
-            client.DataReceived += (sender, e) => {
-                byte[] data = new byte[e.BytesTransferred];
-                Array.Copy(e.Buffer, e.Offset, data, 0, data.Length);
-                string info = Encoding.Default.GetString(data);
-                Console.WriteLine("client got:{0}",info);
-            };
-            client.Connect();
-            client.Listen();
-
-            client.Send(Encoding.Default.GetBytes("dsa"));            
-
-            while (true) { }
+            DateTime t = DateTime.Now;
+            for (int i = 0; i < 10000; i++)
+            {
+                IOCPClient client = new IOCPClient(IPAddress.Parse("127.0.0.1"), 8088);
+                client.DataReceived += (sender, e) => {
+                    string info = e.GetReceived();
+                    ((IOCPClient)sender).Close();
+                    if (i == 9999)
+                        Console.WriteLine((DateTime.Now-t).TotalMilliseconds);
+                };
+                client.Connect(i);
+                client.Listen();
+                client.Send(Encoding.Default.GetBytes(i.ToString()));
+            }
+            Console.ReadKey();
         }
     }
 }

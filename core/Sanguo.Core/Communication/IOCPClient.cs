@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 
 namespace Sanguo.Core.Communication
 {
@@ -23,6 +20,10 @@ namespace Sanguo.Core.Communication
             _port = port;
         }
         public void Connect()
+        {
+            _socket.Connect(_ip, _port);
+        }
+        public void Connect(int c)
         {
             _socket.Connect(_ip, _port);
         }
@@ -48,6 +49,7 @@ namespace Sanguo.Core.Communication
                 _socket.ReceiveAsync(_receiveArgs);
             }
         }
+        public void Close() => _socket.Close();
 
         #region 接收数据
 
@@ -64,8 +66,8 @@ namespace Sanguo.Core.Communication
                 {
                     if (_socket.Available == 0)
                         DataReceived?.Invoke(this, e);
-                    if (!_socket.ReceiveAsync(e))//为接收下一段数据，投递接收请求，这个函数有可能同步完成，这时返回false，并且不会引发SocketAsyncEventArgs.Completed事件
-                        //同步接收时处理接收完成事件
+                    if (_socket.Connected&&!_socket.ReceiveAsync(e))//为接收下一段数据，投递接收请求，这个函数有可能同步完成，这时返回false，并且不会引发SocketAsyncEventArgs.Completed事件
+                            //同步接收时处理接收完成事件
                         ProcessReceive(e);
                 }
             }
@@ -109,7 +111,7 @@ namespace Sanguo.Core.Communication
                 s.Close();
             }
         }
-        public event EventHandler<SocketAsyncEventArgs> Connected;
+    
         public event EventHandler<SocketAsyncEventArgs> DataReceived;
         public event EventHandler<SocketAsyncEventArgs> DataSent;
     }
