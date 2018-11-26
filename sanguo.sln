@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.28010.2050
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanguo.HubServer", "server\Sanguo.HubServer\Sanguo.HubServer.csproj", "{37C66DAF-768C-4540-9BA5-7351737E54E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanguo.Core", "core\Sanguo.Core\Sanguo.Core.csproj", "{D4FDB757-9DE5-4AA0-AD25-5440E98559BC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanguo.Core", "core\Sanguo.Core\Sanguo.Core.csproj", "{D4FDB757-9DE5-4AA0-AD25-5440E98559BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanguo.ConsoleClient", "client\Sanguo.ConsoleClient\Sanguo.ConsoleClient.csproj", "{0F1C022B-5219-48B5-A74B-9F1394FE476E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{D4FDB757-9DE5-4AA0-AD25-5440E98559BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4FDB757-9DE5-4AA0-AD25-5440E98559BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4FDB757-9DE5-4AA0-AD25-5440E98559BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F1C022B-5219-48B5-A74B-9F1394FE476E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F1C022B-5219-48B5-A74B-9F1394FE476E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F1C022B-5219-48B5-A74B-9F1394FE476E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F1C022B-5219-48B5-A74B-9F1394FE476E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

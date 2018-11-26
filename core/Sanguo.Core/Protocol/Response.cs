@@ -1,4 +1,4 @@
-﻿namespace Sanguo.Core.Communication
+﻿namespace Sanguo.Core.Protocol
 {
     public class Response
     {

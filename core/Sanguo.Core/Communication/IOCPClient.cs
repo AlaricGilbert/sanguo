@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Sanguo.Core.Communication
 {
@@ -92,6 +93,8 @@ namespace Sanguo.Core.Communication
             _sendArgs.Completed += DataSent;
             _socket.SendAsync(_sendArgs);
         }
+
+        public void Send(string str) => Send(Encoding.Default.GetBytes(str));
 
         #endregion
 

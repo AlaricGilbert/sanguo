@@ -1,50 +1,48 @@
-﻿using Sanguo.Core.Communication;
+﻿using Newtonsoft.Json;
+using Sanguo.Core.Communication;
+using Sanguo.Core.Protocol;
 using System;
+using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Sanguo.HubServer
 {
     class Program
     {
+
+        public const int Port = 18112;
+        public const int MaxClient = 1000;
+        static IOCPServer hubServer;
+
         static void Main(string[] args)
         {
+            #region Plugin
+            List<IHubPlugin> hubPlugins = new List<IHubPlugin>();
+            hubPlugins.Add(new HubServer());
+            //Todo: load out-side plugins
 
-            IOCPServer server = new IOCPServer(8088, 10000);
-            server.DataReceived += (sender, e) =>
+            foreach (var plugin in hubPlugins)
+                plugin.OnLoad();
+            #endregion
+
+            #region Server startion
+            hubServer = new IOCPServer(Port, MaxClient);
+            hubServer.DataReceived += (sender, e) =>
             {
-                string info = e.GetReceived();
-                //Console.WriteLine("server got:{0}",info);
-                ((IOCPServer)sender).Send(e, Encoding.Default.GetBytes(info));
+                try
+                {
+                    string jsonRequest = e.GetReceived();
+                    Request r = JsonConvert.DeserializeObject<Request>(jsonRequest);
+                    Hub.HandleRequest(r.RequestType, jsonRequest, (IOCPServer)sender, e);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
             };
-            server.Init();
-            server.Start();
-            for (int i = 0; i < 100; i++)
-            {
-                ClientPressureTest();
-                Thread.Sleep(6000);
-            }
-            Console.ReadKey();
-        }
-        static void ClientPressureTest()
-        {
-            DateTime t = DateTime.Now;
-            for (int i = 0; i < 5000; i++)
-            {
-                IOCPClient client = new IOCPClient(IPAddress.Parse("127.0.0.1"), 8088);
-                client.DataReceived += (sender, e) => {
-                    string info = e.GetReceived();
-                    if (i == 5999)
-                        Console.WriteLine((DateTime.Now - t).TotalMilliseconds);
-                    ((IOCPClient)sender).Close();
-                };
-                client.Connect(i);
-                client.Listen();
-                client.Send(Encoding.Default.GetBytes(i.ToString()));
-            }
+            hubServer.Init();
+            hubServer.Start();
+            #endregion
         }
     }
 }

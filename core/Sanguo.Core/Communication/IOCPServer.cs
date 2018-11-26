@@ -350,6 +350,8 @@ namespace Sanguo.Core.Communication
             ((Socket)e.UserToken).SendAsync(e);
         }
 
+        public void Send(SocketAsyncEventArgs e, string data) => Send(e, Encoding.Default.GetBytes(data));
+
         /// <summary>
         /// 同步的使用socket发送数据
         /// </summary>

@@ -1,19 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Newtonsoft.Json;
 using Sanguo.Core.Communication;
+using Sanguo.Core.Protocol;
+using System;
+using System.Collections.Generic;
 
 namespace Sanguo.HubServer
 {
-    static class HubServer
+    class HubServer : IHubPlugin
     {
-        public const int Port = 18112;
-        public const int MaxClient = 1000;
-        static IOCPServer hubServer;
-        public static void Start()
+        public void OnLoad()
         {
-            hubServer = new IOCPServer(Port, MaxClient);
-            
+            Hub.RequestHandler hsHandler = (json, server, args) =>
+            {
+                HandshakeRequest request = JsonConvert.DeserializeObject<HandshakeRequest>(json);
+                if (request.RequestMessage == HandshakeRequest.MagicMessage)
+                    server.Send(args, JsonConvert.SerializeObject(HandshakeResponse.Default));
+                else
+                    server.Send(args, JsonConvert.SerializeObject(HandshakeResponse.WrongMagicMessage));
+            };
+            Hub.AddRequestHandler(typeof(HandshakeRequest).ToString(), hsHandler);
         }
     }
 }
