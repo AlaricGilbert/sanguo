@@ -49,7 +49,7 @@ namespace Sanguo.Core.Communication
                 _socket.ReceiveAsync(_receiveArgs);
             }
         }
-        public void Close() => _socket.Close();
+        public void Close() => _socket.Dispose();
 
         #region 接收数据
 

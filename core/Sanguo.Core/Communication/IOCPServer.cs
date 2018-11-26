@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -7,7 +9,7 @@ using System.Threading;
 namespace Sanguo.Core.Communication
 {
     /// <summary>
-    /// IOCP SOCKET服务器
+    /// IOCP SOCKET Server
     /// </summary>
     public class IOCPServer : IDisposable
     {
@@ -43,14 +45,18 @@ namespace Sanguo.Core.Communication
         Semaphore _maxAcceptedClients;
 
         /// <summary>
-        /// 缓冲区管理
+        /// Buffer management
         /// </summary>
         BufferManager _bufferManager;
 
         /// <summary>
-        /// 对象池
+        /// Free SASE object pool
         /// </summary>
         SocketAsyncEventArgsPool _objectPool;
+
+        Dictionary<SocketAsyncEventArgs, DateTime> heartbeatDictionary;
+
+        List<SocketAsyncEventArgs> removingList;
 
         private bool disposed = false;
 
@@ -128,7 +134,7 @@ namespace Sanguo.Core.Communication
         #region 初始化
 
         /// <summary>
-        /// 初始化函数
+        /// Initializer method.
         /// </summary>
         public void Init()
         {
@@ -136,13 +142,48 @@ namespace Sanguo.Core.Communication
             // against memory fragmentation
             _bufferManager.InitBuffer();
 
+            // Heartbeat 
+            heartbeatDictionary = new Dictionary<SocketAsyncEventArgs, DateTime>();
+            removingList = new List<SocketAsyncEventArgs>();
+            Thread t_heartbeat = new Thread(() =>
+             {
+                 while (!disposed)
+                 {
+                     lock (heartbeatDictionary)
+                     {
+                         foreach (var sase in heartbeatDictionary.Keys)
+                         {
+                             if ((DateTime.Now - heartbeatDictionary[sase]) > TimeSpan.FromSeconds(5))
+                                 removingList.Add(sase);
+                         }
+                         foreach (var e in removingList)
+                         {
+                             lock (e)
+                             {
+                                 Socket s = e.UserToken as Socket;
+                                 ClientDisconnected?.Invoke(this, e);
+                                 s.Shutdown(SocketShutdown.Send);
+                                 s.Close();
+                                 Interlocked.Decrement(ref _clientCount);
+                                 _maxAcceptedClients.Release();
+                                 _objectPool.Push(e);
+                                 heartbeatDictionary.Remove(e);
+                             }
+                         }
+                         removingList.Clear();
+                     }
+                     Thread.Sleep(1000);
+                 }
+             });
+            t_heartbeat.Start();
             // preallocate pool of SocketAsyncEventArgs objects
             SocketAsyncEventArgs readWriteEventArg;
-
+            
             for (int i = 0; i < _maxClient; i++)
             {
                 //Pre-allocate a set of reusable SocketAsyncEventArgs
                 readWriteEventArg = new SocketAsyncEventArgs();
+                readWriteEventArg.DisconnectReuseSocket = true;
                 readWriteEventArg.Completed += (sender, e) =>
                 {
                     // Determine which type of operation just completed and call the associated handler.
@@ -165,8 +206,10 @@ namespace Sanguo.Core.Communication
 
                 // add SocketAsyncEventArg to the pool
                 _objectPool.Push(readWriteEventArg);
+
             }
         }
+
 
         #endregion
 
@@ -266,12 +309,12 @@ namespace Sanguo.Core.Communication
         {
             if (e.SocketError == SocketError.Success)
             {
+
                 Socket s = e.AcceptSocket;//和客户端关联的socket
                 if (s.Connected)
                 {
                     try
                     {
-
                         Interlocked.Increment(ref _clientCount);//原子操作加1
                         SocketAsyncEventArgs asyniar = _objectPool.Pop();
                         asyniar.UserToken = s;
@@ -281,14 +324,14 @@ namespace Sanguo.Core.Communication
                             ProcessReceive(asyniar);
                         }
                     }
-                    catch (SocketException)
+                    catch (ObjectDisposedException)
                     {
 
                     }
                     StartAccept(e);
                 }
             }
-        }
+            }
 
         #endregion
 
@@ -366,21 +409,20 @@ namespace Sanguo.Core.Communication
                 {
                     //判断所有需接收的数据是否已经完成
                     if (s.Available == 0)
+                    {
                         DataReceived?.Invoke(this, e);
+                        lock (heartbeatDictionary)
+                        {
+                            if (heartbeatDictionary.ContainsKey(e))
+                                heartbeatDictionary[e] = DateTime.Now;
+                            else
+                                heartbeatDictionary.Add(e, DateTime.Now);
+                        }
+                    }
                     if (!s.ReceiveAsync(e))//为接收下一段数据，投递接收请求，这个函数有可能同步完成，这时返回false，并且不会引发SocketAsyncEventArgs.Completed事件
                         //同步接收时处理接收完成事件
                         ProcessReceive(e);
                 }
-            }
-            else
-            {
-                
-                ClientDisconnected?.Invoke(this, e);
-                s.Shutdown(SocketShutdown.Send);
-                s.Close();
-                Interlocked.Decrement(ref _clientCount);
-                _maxAcceptedClients.Release();
-                _objectPool.Push(e);//SocketAsyncEventArg 对象被释放，压入可重用队列。
             }
         }
 
