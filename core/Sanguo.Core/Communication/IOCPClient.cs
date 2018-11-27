@@ -81,11 +81,7 @@ namespace Sanguo.Core.Communication
         #endregion
 
         #region 发送数据
-
-        /// <summary>
-        /// 异步的发送数据
-        /// </summary>
-        /// <param name="e"></param>
+        
         public void Send(byte[] data) {
             if (_sendArgs == null)
                 _sendArgs = new SocketAsyncEventArgs();

@@ -10,8 +10,7 @@ namespace Sanguo.Core.Communication
         {
             byte[] data = new byte[args.BytesTransferred];
             Array.Copy(args.Buffer, args.Offset, data, 0, data.Length);
-            string info = Encoding.Default.GetString(data);
-            return info;
+            return Encoding.Default.GetString(data);
         }
     }
 }

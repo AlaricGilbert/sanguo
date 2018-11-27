@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Sanguo.HubServer
+namespace Sanguo.Core.Protocol
 {
-    class LoginServer
+    public class RegisterResponse
     {
-
     }
 }

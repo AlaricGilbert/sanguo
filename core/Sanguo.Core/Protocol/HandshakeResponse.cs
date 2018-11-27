@@ -7,7 +7,7 @@
         public static readonly HandshakeResponse Default = new HandshakeResponse {
             ServerName = "Sanguo server",
             ProtocolVersion = 1,
-            StateNumber = ResponseStates.HandshakeFinished,
+            StateNumber = ResponseStates.HandshakeSucceeded,
             Status = true,
             ResponseMessage = "HandshakeRequest finished successfully."
         };
