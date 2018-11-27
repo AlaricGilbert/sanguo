@@ -4,7 +4,7 @@ using System;
 
 namespace Sanguo.HubServer
 {
-    class HubServer : IHubPlugin
+    class LoginServer : IHubPlugin
     {
         public void OnLoad()
         {
@@ -23,14 +23,19 @@ namespace Sanguo.HubServer
                 LoginRequest request = JsonConvert.DeserializeObject<LoginRequest>(json);
                 if(await Hub.LoginDB.LoginAsync(request))
                 {
+                    string sessionID = Guid.NewGuid().ToString();
                     LoginResponse response = new LoginResponse
                     {
-                        SessionID = Guid.NewGuid().ToString(),
+                        SessionID = sessionID,
                         ResponseMessage = "Log-in operation succeeded.",
                         Status = true,
                         StateNumber = ResponseStates.LoginSucceeded
                     };
                     server.Send(args, JsonConvert.SerializeObject(response));
+                    if (Hub.SessionIDs.ContainsKey(request.Username))
+                        Hub.SessionIDs[request.Username] = sessionID;
+                    else
+                        Hub.SessionIDs.Add(request.Username, sessionID);
                 }
                 else
                 {

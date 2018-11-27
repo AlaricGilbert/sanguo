@@ -8,6 +8,8 @@ A "San Guo Sha" implementation written in C#.
 
 ​     ├───doc 
 
+​     ├───core
+
 ​     ├───client
 
 ​     └───server
@@ -25,14 +27,14 @@ A "San Guo Sha" implementation written in C#.
   * ■ Network connection workflow
 * □ Server
   * ■ Reusable IOCP Server framework
-  * □ Login server
+  * ◘ Login server
   * ◘ Hub server
   * □ Game server
 * □ Client[Console mode]
-  * □ Login client
+  * ◘ Login client
   * □ Game client
 * □ Protocol
-  * □ Log-in&Session
+  * ◘ Log-in&Session
   * □ Hall info
   * □ Game request
   * □ Gaming info
