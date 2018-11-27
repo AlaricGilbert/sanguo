@@ -8,11 +8,10 @@ namespace Sanguo.ConsoleClient
 {
     public static class Client
     {
+        static IOCPClient client = new IOCPClient(IPAddress.Parse("127.0.0.1"), 18112);
+        static bool waiting = true;
         public static void Run()
         {
-
-            bool waiting = true;
-            IOCPClient client = new IOCPClient(IPAddress.Parse("127.0.0.1"), 18112);
             client.DataReceived += (sender, e) =>
             {
                 string info = e.GetReceived();
@@ -21,8 +20,19 @@ namespace Sanguo.ConsoleClient
             };
             client.Connect();
             client.Listen();
-
-
+            HandShake();
+            Login();
+        }
+        static void HandShake()
+        {
+            HandshakeRequest handshakeRequest = HandshakeRequest.Default;
+            string s = JsonConvert.SerializeObject(handshakeRequest);
+            Console.WriteLine(s);
+            client.Send(s);
+        }
+        static void Login()
+        {
+            while (waiting) { }
             LoginRequest loginRequest = new LoginRequest
             {
                 Username = "alaric",
@@ -33,6 +43,8 @@ namespace Sanguo.ConsoleClient
             string s = JsonConvert.SerializeObject(loginRequest);
             Console.WriteLine(s);
             client.Send(s);
+            waiting = true;
+
 
             while (waiting) { }
 
@@ -43,10 +55,9 @@ namespace Sanguo.ConsoleClient
                 RequestType = typeof(LoginRequest).ToString()
             };
 
-            string sp = JsonConvert.SerializeObject(loginRequest1);
-            Console.WriteLine(sp);
-            client.Send(sp);
-
+            s = JsonConvert.SerializeObject(loginRequest1);
+            Console.WriteLine(s);
+            client.Send(s);
         }
     }
 }
