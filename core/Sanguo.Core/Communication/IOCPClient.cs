@@ -24,10 +24,6 @@ namespace Sanguo.Core.Communication
         {
             _socket.Connect(_ip, _port);
         }
-        public void Connect(int c)
-        {
-            _socket.Connect(_ip, _port);
-        }
         public void Listen()
         {
             if (_receiveArgs == null)
@@ -52,23 +48,21 @@ namespace Sanguo.Core.Communication
         }
         public void Close() => _socket.Dispose();
 
-        #region 接收数据
+        #region Receive data
 
         /// <summary>
-        ///接收完成时处理函数
+        /// Process the data received.
         /// </summary>
-        /// <param name="e">与接收完成操作相关联的SocketAsyncEventArg对象</param>
+        /// <param name="e"></param>
         private void ProcessReceive(SocketAsyncEventArgs e)
         {
-            if (e.SocketError == SocketError.Success)//if (e.BytesTransferred > 0 && e.SocketError == SocketError.Success)
+            if (e.SocketError == SocketError.Success)
             {
-                // 检查远程主机是否关闭连接
                 if (e.BytesTransferred > 0)
                 {
                     if (_socket.Available == 0)
                         DataReceived?.Invoke(this, e);
-                    if (_socket.Connected&&!_socket.ReceiveAsync(e))//为接收下一段数据，投递接收请求，这个函数有可能同步完成，这时返回false，并且不会引发SocketAsyncEventArgs.Completed事件
-                            //同步接收时处理接收完成事件
+                    if (_socket.Connected&&!_socket.ReceiveAsync(e))
                         ProcessReceive(e);
                 }
             }
@@ -80,7 +74,7 @@ namespace Sanguo.Core.Communication
 
         #endregion
 
-        #region 发送数据
+        #region Send data
         
         public void Send(byte[] data) {
             if (_sendArgs == null)
