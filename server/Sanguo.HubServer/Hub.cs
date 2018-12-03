@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Sanguo.Core;
 using Sanguo.Core.Communication;
 using Sanguo.Core.Protocol;
 using System;
@@ -10,10 +11,12 @@ namespace Sanguo.HubServer
 {
     public static class Hub
     {
+        public static Logger HubLogger = new Logger("hub");
+
         #region Hub IOCP fields.
         public const int Port = 18112;
         public const int MaxClient = 1000;
-        static IOCPServer hubServer;
+        private static IOCPServer _hubServer;
         #endregion
 
         #region Hub Request Handlers
@@ -32,12 +35,17 @@ namespace Sanguo.HubServer
         #endregion
 
         #region Lobby Servers
-        List<>
-
+        public static Dictionary<string, LobbyInfo> LobbyInfos = new Dictionary<string, LobbyInfo>();
         #endregion
+
+        #region Message Hook
+        public delegate void MessageHandler(string m);
+        public static event MessageHandler MessageReceived;
+        #endregion
+
         public static void Run()
         {
-            #region Initialize 
+            #region Initialize hub plugs
             List<IHubPlugin> hubPlugins = new List<IHubPlugin>
             {
                 new LoginServer(),
@@ -64,22 +72,27 @@ namespace Sanguo.HubServer
             LoginDB.Open();
 
             #region Server startion
-            hubServer = new IOCPServer(Port, MaxClient);
-            hubServer.DataReceived += (sender, e) =>
+            _hubServer = new IOCPServer(Port, MaxClient);
+            _hubServer.DataReceived += (sender, e) =>
             {
+                string jsonRequest = "";
                 try
                 {
-                    string jsonRequest = e.GetReceived();
+                    jsonRequest = e.GetReceived();
                     Request r = JsonConvert.DeserializeObject<Request>(jsonRequest);
                     HandleRequest(r.RequestType, jsonRequest, (IOCPServer)sender, e);
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex);
+                    HubLogger.Write(ex);
+                }
+                finally
+                {
+                    MessageReceived(jsonRequest);
                 }
             };
-            hubServer.Init();
-            hubServer.Start();
+            _hubServer.Init();
+            _hubServer.Start();
             #endregion
         }
     }

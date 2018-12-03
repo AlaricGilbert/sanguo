@@ -7,7 +7,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanguo.HubServer", "server\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanguo.Core", "core\Sanguo.Core\Sanguo.Core.csproj", "{D4FDB757-9DE5-4AA0-AD25-5440E98559BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanguo.ConsoleClient", "client\Sanguo.ConsoleClient\Sanguo.ConsoleClient.csproj", "{0F1C022B-5219-48B5-A74B-9F1394FE476E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sanguo.ConsoleClient", "client\Sanguo.ConsoleClient\Sanguo.ConsoleClient.csproj", "{0F1C022B-5219-48B5-A74B-9F1394FE476E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sanguo.Lobby", "server\Sanguo.Lobby\Sanguo.Lobby.csproj", "{3701B41F-E646-4B17-8FBB-C39CA139A377}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Client", "Client", "{D73B836F-7AD3-4FC2-83EF-031700EBE81F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{C3D6408D-CDDE-4426-AEDC-1CCBBE1F81B6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{94D86F7E-34EA-495A-8A42-B9A94A1AD950}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,9 +35,19 @@ Global
 		{0F1C022B-5219-48B5-A74B-9F1394FE476E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0F1C022B-5219-48B5-A74B-9F1394FE476E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0F1C022B-5219-48B5-A74B-9F1394FE476E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3701B41F-E646-4B17-8FBB-C39CA139A377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3701B41F-E646-4B17-8FBB-C39CA139A377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3701B41F-E646-4B17-8FBB-C39CA139A377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3701B41F-E646-4B17-8FBB-C39CA139A377}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{37C66DAF-768C-4540-9BA5-7351737E54E2} = {94D86F7E-34EA-495A-8A42-B9A94A1AD950}
+		{D4FDB757-9DE5-4AA0-AD25-5440E98559BC} = {C3D6408D-CDDE-4426-AEDC-1CCBBE1F81B6}
+		{0F1C022B-5219-48B5-A74B-9F1394FE476E} = {D73B836F-7AD3-4FC2-83EF-031700EBE81F}
+		{3701B41F-E646-4B17-8FBB-C39CA139A377} = {94D86F7E-34EA-495A-8A42-B9A94A1AD950}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DCBC8D80-0AE3-4732-BA81-315F346037DF}

@@ -3,6 +3,7 @@ using Sanguo.Core.Communication;
 using Sanguo.Core.Protocol;
 using System;
 using System.Net;
+using System.Threading;
 
 namespace Sanguo.ConsoleClient
 {
@@ -15,7 +16,7 @@ namespace Sanguo.ConsoleClient
             client.DataReceived += (sender, e) =>
             {
                 string info = e.GetReceived();
-                Console.WriteLine(info);
+                Program.logger.Write(info, "ConsoleClient/DataReceived", Core.Logger.LogLevel.Infos);
                 waiting = false;
             };
             client.Connect();
@@ -27,7 +28,6 @@ namespace Sanguo.ConsoleClient
         {
             HandshakeRequest handshakeRequest = HandshakeRequest.Default;
             string s = JsonConvert.SerializeObject(handshakeRequest);
-            Console.WriteLine(s);
             client.Send(s);
         }
         static void Login()
@@ -41,23 +41,12 @@ namespace Sanguo.ConsoleClient
             };
 
             string s = JsonConvert.SerializeObject(loginRequest);
-            Console.WriteLine(s);
             client.Send(s);
             waiting = true;
-
-
             while (waiting) { }
-
-            LoginRequest loginRequest1 = new LoginRequest
-            {
-                Username = "alaric",
-                HashedPw = "777",
-                RequestType = typeof(LoginRequest).ToString()
-            };
-
-            s = JsonConvert.SerializeObject(loginRequest1);
-            Console.WriteLine(s);
-            client.Send(s);
+            Thread.Sleep(1000);
+            AvailableLobbiesRequest r = AvailableLobbiesRequest.Default;
+            client.Send(JsonConvert.SerializeObject(r));
         }
     }
 }
