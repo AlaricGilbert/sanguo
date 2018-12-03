@@ -17,14 +17,16 @@ namespace Sanguo.Core.Protocol
         {
             ResponseMessage = "Wrong magic string, communication initialization failed.",
             StateNumber = ResponseStates.LOSFVerifyFailed,
-            Status = false
+            Status = false,
+            ResponseType = "LOSFResponse"
         };
         [JsonIgnore]
         public static readonly Response LOSFFinishedResponse = new Response
         {
             ResponseMessage = "LOSF operation succeeded.",
             StateNumber = ResponseStates.LOSFSucceeded,
-            Status = true
+            Status = true,
+            ResponseType = "LOSFResponse"
         };
         public string IPAddress { get; set; }
         public int Port { get; set; }

@@ -5,5 +5,6 @@
         public int StateNumber { get; set; }
         public bool Status { get; set; }
         public string ResponseMessage { get; set; }
+        public string ResponseType { get; set; }
     }
 }
