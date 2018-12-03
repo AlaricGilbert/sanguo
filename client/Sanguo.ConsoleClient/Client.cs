@@ -62,6 +62,18 @@ namespace Sanguo.ConsoleClient
             void availableLobbyHandler(string jsonResp)
             {
                 Program.logger.Write("lobby-got ok.", "Client/CommuniHandler", Core.Logger.LogLevel.Infos);
+                AvailableLobbiesResponse r = JsonConvert.DeserializeObject<AvailableLobbiesResponse>(jsonResp);
+                string ip = "";
+                int port = 0;
+                foreach (var item in r.LobbyInfos)
+                {
+                    ip = item.Value.IP;
+                    port = item.Value.Port;
+                    break;
+                }
+                IOCPClient client = new IOCPClient(IPAddress.Parse(ip), port);
+                client.Connect();
+                client.Listen();
             }
             ResponseHandler.Add(typeof(AvailableLobbiesResponse).ToString(), availableLobbyHandler);
         }
