@@ -19,7 +19,8 @@ namespace Sanguo.HubServer
                         SessionID = sessionID,
                         ResponseMessage = "Log-in operation succeeded.",
                         Status = true,
-                        StateNumber = ResponseStates.LoginSucceeded
+                        StateNumber = ResponseStates.LoginSucceeded,
+                        ResponseType = typeof(LoginResponse).ToString()
                     };
                     server.Send(args, JsonConvert.SerializeObject(response));
                     if (Hub.SessionIDs.ContainsKey(request.Username))
@@ -34,7 +35,8 @@ namespace Sanguo.HubServer
                         SessionID = LoginResponse.LoginFailedMagicSessionID,
                         ResponseMessage = "Wrong username or password, or the account does not exist.",
                         Status = false,
-                        StateNumber = ResponseStates.LoginVerifyFailed
+                        StateNumber = ResponseStates.LoginVerifyFailed,
+                        ResponseType = typeof(LoginResponse).ToString()
                     };
                     server.Send(args, JsonConvert.SerializeObject(response));
                 }

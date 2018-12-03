@@ -34,7 +34,8 @@ namespace Sanguo.HubServer
                     ResponseMessage = "Operation finished correctly",
                     StateNumber = ResponseStates.Succeeded,
                     Status = true,
-                    LobbyInfos = Hub.LobbyInfos
+                    LobbyInfos = Hub.LobbyInfos,
+                    ResponseType = typeof(AvailableLobbiesResponse).ToString()
                 }));
             }
             Hub.AddRequestHandler(typeof(AvailableLobbiesRequest).ToString(), availableLobbiesHandler);

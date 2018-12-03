@@ -9,7 +9,8 @@
             ProtocolVersion = 1,
             StateNumber = ResponseStates.HandshakeSucceeded,
             Status = true,
-            ResponseMessage = "HandshakeRequest finished successfully."
+            ResponseMessage = "HandshakeRequest finished successfully.",
+            ResponseType = typeof(HandshakeResponse).ToString()
         };
         public static readonly HandshakeResponse WrongMagicMessage = new HandshakeResponse
         {
@@ -17,7 +18,8 @@
             ProtocolVersion = 1,
             StateNumber = ResponseStates.HandshakeVerifyFailed,
             Status = false,
-            ResponseMessage = "Wrong magic message."
+            ResponseMessage = "Wrong magic message.",
+            ResponseType = typeof(HandshakeResponse).ToString()
         };
     }
 }

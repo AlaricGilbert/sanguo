@@ -9,7 +9,7 @@
 
 #if DEBUG
             HubServer.Hub.Run();
-            HubServer.Hub.MessageReceived += (string m) => logger.Write(m, "ConsoleClient/MainMethod", Core.Logger.LogLevel.Infos);
+            HubServer.Hub.MessageReceived += (string m) => logger.Write(m, "HubServer/DataReceived", Core.Logger.LogLevel.Infos);
             Lobby.Lobby lobby = new Lobby.Lobby(123, 1000);
             lobby.Run();
 #endif
