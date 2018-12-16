@@ -35,10 +35,8 @@ namespace Sanguo.ConsoleClient
                     CreateNoWindow = false
                 }
             };
-            _hubProcess.Start();//
-            Thread.Sleep(100);//wait the hub init.
+            _hubProcess.Start();
             _lobbyProcess.Start();
-            Thread.Sleep(100);//wait the lobby and hub connect.
 #endif
             Client.Run();
         }

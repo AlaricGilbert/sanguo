@@ -6,9 +6,9 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <OutputPath>$(SolutionDir)artifacts</OutputPath>
+    <OutputPath>..\..\artifacts</OutputPath>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\..\core\Sanguo.Core\Sanguo.Core.csproj" />
   </ItemGroup>

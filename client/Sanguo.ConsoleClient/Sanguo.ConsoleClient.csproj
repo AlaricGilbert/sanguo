@@ -13,7 +13,7 @@
     <ProjectReference Include="..\..\core\Sanguo.Core\Sanguo.Core.csproj" />
   </ItemGroup>
 
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="cd $(SolutionDir)&#xD;&#xA;cd server&#xD;&#xA;cd Sanguo.HubServer&#xD;&#xA;dotnet build&#xD;&#xA;cd ..&#xD;&#xA;cd Sanguo.Lobby&#xD;&#xA;dotnet build" />
   </Target>
 
