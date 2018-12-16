@@ -1,12 +1,13 @@
 ﻿using Newtonsoft.Json;
+using Sanguo.Core;
 using Sanguo.Core.Protocol;
 using System;
 
 namespace Sanguo.HubServer
 {
-    class LoginServer : IHubPlugin
+    class LoginServer : ISanguoPlugin
     {
-        public void OnLoad()
+        public void OnServerLoaded()
         {
             Hub.RequestHandler loginHandler = async (json, server, args) =>
             {
@@ -43,5 +44,6 @@ namespace Sanguo.HubServer
             };
             Hub.AddRequestHandler(typeof(LoginRequest).ToString(), loginHandler);
         }
+        public void OnClientLoaded() { }
     }
 }

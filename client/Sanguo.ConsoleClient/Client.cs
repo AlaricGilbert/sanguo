@@ -71,6 +71,7 @@ namespace Sanguo.ConsoleClient
                     port = item.Value.Port;
                     break;
                 }
+               
                 IOCPClient client = new IOCPClient(IPAddress.Parse(ip), port);
                 client.Connect();
                 client.Listen();
@@ -102,6 +103,7 @@ namespace Sanguo.ConsoleClient
 #endif
             AvailableLobbiesRequest r = AvailableLobbiesRequest.Default;
             client.Send(JsonConvert.SerializeObject(r));
+            while (true) ;
         }
     }
 }

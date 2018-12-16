@@ -46,7 +46,7 @@ namespace Sanguo.HubServer
         public static void Run()
         {
             #region Initialize hub plugs
-            List<IHubPlugin> hubPlugins = new List<IHubPlugin>
+            List<ISanguoPlugin> hubPlugins = new List<ISanguoPlugin>
             {
                 new LoginServer(),
                 new LobbyHoster()
@@ -66,7 +66,7 @@ namespace Sanguo.HubServer
 
             //Load all plugins.
             foreach (var plugin in hubPlugins)
-                plugin.OnLoad();
+                plugin.OnServerLoaded();
             #endregion
 
             LoginDB.Open();
