@@ -7,8 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\core\Sanguo.Core\Sanguo.Core.csproj" />
-    <ProjectReference Include="..\..\server\Sanguo.HubServer\Sanguo.HubServer.csproj" />
-    <ProjectReference Include="..\..\server\Sanguo.Lobby\Sanguo.Lobby.csproj" />
   </ItemGroup>
 
 </Project>

@@ -16,30 +16,31 @@ A "San Guo Sha" implementation written in C#.
 
 ## Roadmap[α-0.0.1]
 
-■ Stands for finished.
+| Mark | Description |
+| ------------- | ------------- |
+| [ ] | work not started |
+| [x] | work completed |
+| :runner: | on-going work |
 
-□ Stands for unfinished.
-
-◘ Stands for half-finished.
-* □ Documentation
-  * ◘ Overall analysis
-  * ■ Gaming process analysis 
-  * ■ Network connection workflow
-* □ Server
-  * ■ Reusable IOCP Server framework
-  * ◘ Login server
-  * ◘ Hub server
-  * □ Game server
-* □ Client[Console mode]
-  * ◘ Login client
-  * □ Game client
-* □ Protocol
-  * ◘ Log-in&Session
-  * □ Hall info
-  * □ Game request
-  * □ Gaming info
-* □ Utilities
-  * □ Universial card father
-  * □ Resource finder
-  * □ Plugin manager -> card expandable.
-* □ Client[UI/Unity]
+* :runner: Documentation
+  * :runner: Overall analysis
+  * [x] Gaming process analysis
+  * [x] Network connection workflow
+* :runner: Server
+  * [x] Reusable IOCP Server framework
+  * :runner: Login server
+  * :runner: Hub server
+  * [ ] Game server
+* :runner: Client[Console mode]
+  * :runner: Login client
+  * [ ] Game client
+* :runner: Protocol
+  * :runner: Log-in&Session
+  * [ ] Hall info
+  * [ ] Game request
+  * [ ] Gaming info
+* [ ] Utilities
+  * [ ] Universial card father
+  * [ ] Resource finder
+  * [ ] Plugin manager -> card expandable.
+* [ ] Client[UI/Unity]
