@@ -11,12 +11,11 @@ namespace Sanguo.ConsoleClient
         {
             //Run a built-in server to simplify the debug workflow.
 #if DEBUG
-            string dir = Path.Combine("..", "..", "..", "..", "..", "server", "srvn", "bin", "Debug", "netcoreapp2.1", "srvn.exe");
             Process _hubProcess = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = dir.Replace("srvn", "Sanguo.HubServer"),
+                    FileName = "Sanguo.HubServer.exe",
                     Arguments = "",
                     RedirectStandardError = false,
                     RedirectStandardInput = false,
@@ -28,7 +27,7 @@ namespace Sanguo.ConsoleClient
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = dir.Replace("srvn", "Sanguo.Lobby"),
+                    FileName = "Sanguo.Lobby.exe",
                     Arguments = "-p 10022",
                     RedirectStandardError = false,
                     RedirectStandardInput = false,
