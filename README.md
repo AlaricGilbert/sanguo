@@ -14,28 +14,28 @@ A "San Guo Sha" implementation written in C#.
 
 ​     └───server
 
-## Roadmap[α-0.0.1]
+## Roadmap[α-0.0.1.rev2]
 
-| Mark | Description |
-| ------------- | ------------- |
-| [ ] | work not started |
-| [x] | work completed |
-| :runner: | on-going work |
+|     Mark     |    Description    |
+| ------------ | ----------------- |
+|    bullet    |  work not started |
+|  chexk mark  |   work completed  |
+|   :runner:   |   on-going work   |
 
-* :runner: Documentation
-  * :runner: Overall analysis
+* [ ] :runner: Documentation
+  * [ ] :runner: Overall analysis
   * [x] Gaming process analysis
   * [x] Network connection workflow
-* :runner: Server
+* [ ] :runner: Server
   * [x] Reusable IOCP Server framework
-  * :runner: Login server
-  * :runner: Hub server
+  * [ ] :runner: Login server
+  * [ ] :runner: Hub server
   * [ ] Game server
-* :runner: Client[Console mode]
-  * :runner: Login client
+* [ ] :runner: Client[Console mode]
+  * [ ]  :runner: Login client
   * [ ] Game client
-* :runner: Protocol
-  * :runner: Log-in&Session
+* [ ] :runner: Protocol
+  * [ ] :runner: Log-in&Session
   * [ ] Hall info
   * [ ] Game request
   * [ ] Gaming info
@@ -44,3 +44,4 @@ A "San Guo Sha" implementation written in C#.
   * [ ] Resource finder
   * [ ] Plugin manager -> card expandable.
 * [ ] Client[UI/Unity]
+
