@@ -2,6 +2,7 @@
 using Sanguo.Core;
 using Sanguo.Core.Communication;
 using Sanguo.Core.Protocol.Common;
+using Sanguo.Core.Protocol.Lobby;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -49,7 +50,7 @@ namespace Sanguo.HubServer
             List<ISanguoPlugin> hubPlugins = new List<ISanguoPlugin>
             {
                 new LoginRequestHandler(),
-                new LobbyOnlineRequestHandler()
+                new OnlineLobbiesRequestHandler()
             };
             //Todo: load out-side plugins
 

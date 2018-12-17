@@ -8,7 +8,7 @@ using Sanguo.Core.Protocol.Common;
 
 namespace Sanguo.HubServer
 {
-    class LobbyOnlineRequestHandler: ISanguoPlugin
+    class OnlineLobbiesRequestHandler: ISanguoPlugin
     {
         public void OnServerLoadedOnly()
         {

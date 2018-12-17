@@ -1,20 +1,22 @@
 ﻿using Sanguo.Core.Communication;
+using Sanguo.Core.Protocol.Lobby;
 
 namespace Sanguo.Lobby
 {
-    class Room
+    public class Room
     {
-        public const int MaxClientCount = 5;
-        public int ClientCount { get { return _server.ClientCount; } }
-        public int RoomPort { get; }
-        public string Identity { get; }
+        public RoomInfo RoomInfo { get; set; }
         private readonly IOCPServer _server; 
         public Room(int roomPort, string identity)
         {
-            RoomPort = roomPort;
-            //identity should be lobby-unique!.
-            Identity = identity;
-            _server = new IOCPServer(roomPort, MaxClientCount);
+            RoomInfo = new RoomInfo
+            {
+                Identity = identity,
+                RoomPort = roomPort,
+                MaxPlayers = 5,
+                JoinedPlayers = 0
+            };
+            _server = new IOCPServer(roomPort, 5);
             _server.Init();
             _server.Start();
             

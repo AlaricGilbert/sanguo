@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 
-namespace Sanguo.Core.Communication
+namespace Sanguo.Core.Protocol.Lobby
 {
     public class LobbyInfo
     {

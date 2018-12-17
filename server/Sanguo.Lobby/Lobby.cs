@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Sanguo.Core;
 using Sanguo.Core.Communication;
+using Sanguo.Core.Protocol.Common;
 using Sanguo.Core.Protocol.Lobby;
 using System.Collections.Generic;
 using System.Net;
@@ -20,6 +21,9 @@ namespace Sanguo.Lobby
         public static string LobbyAddr { get; internal set; }
         private static IOCPServer _lobbyServer;
         private static IOCPClient _hubConnecter;
+
+        public static List<Room> Rooms = new List<Room>();
+        public static List<RoomInfo> RoomInfos = new List<RoomInfo>();
         public static void Init(int lobbyPort, int maxClients)
         {
             Port = lobbyPort;
@@ -41,11 +45,19 @@ namespace Sanguo.Lobby
             {
                 new LobbyRequestsHandler()
             };
-            //To do : client-side outside plugins load.
+            //[To do : client-side outside plugins load.
+
+            //]
             foreach(var plug in plugins)
             {
                 plug.OnServerLoadedOnly();
             }
+            _lobbyServer.DataReceived += (sender, e) =>
+            {
+                string jsonRequest = e.GetReceived();
+                Request r = JsonConvert.DeserializeObject<Request>(jsonRequest);
+                _lobbyRequestHandlers[r.RequestType](jsonRequest, (IOCPServer)sender, e);
+            };
 
 
             LOSFRequest losf = new LOSFRequest
@@ -57,6 +69,15 @@ namespace Sanguo.Lobby
                 ServerIdentifier = "pris01"
             };
             _hubConnecter.Send(JsonConvert.SerializeObject(losf));
+
+            //Init 10 rooms.
+            for (int i = 0; i < 10; i++)
+            {
+                Room room = new Room(i + 20000, $"Room_{i}");
+                Rooms.Add(room);
+                RoomInfos.Add(room.RoomInfo);
+            }
+            while (true) { }
         }
     }
 }
