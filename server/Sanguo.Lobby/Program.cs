@@ -14,8 +14,8 @@ namespace Sanguo.Lobby
                     port = Convert.ToInt32(args[1]);
                 }
             }
-            Lobby lobby = new Lobby(port, 5 * 1000);
-            lobby.Run();
+            Lobby.Init(port, 5 * 1000);
+            Lobby.Run();
         }
     }
 }

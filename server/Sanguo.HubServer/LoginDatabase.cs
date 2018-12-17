@@ -1,5 +1,5 @@
 ﻿using Sanguo.Core.Data;
-using Sanguo.Core.Protocol;
+using Sanguo.Core.Protocol.Hub;
 using System.Data;
 using System.Threading.Tasks;
 

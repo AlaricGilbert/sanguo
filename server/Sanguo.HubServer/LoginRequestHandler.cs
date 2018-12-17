@@ -1,13 +1,14 @@
 ﻿using Newtonsoft.Json;
 using Sanguo.Core;
-using Sanguo.Core.Protocol;
+using Sanguo.Core.Protocol.Common;
+using Sanguo.Core.Protocol.Hub;
 using System;
 
 namespace Sanguo.HubServer
 {
-    class LoginServer : ISanguoPlugin
+    class LoginRequestHandler : ISanguoPlugin
     {
-        public void OnServerLoaded()
+        public void OnServerLoadedOnly()
         {
             Hub.RequestHandler loginHandler = async (json, server, args) =>
             {
@@ -44,6 +45,13 @@ namespace Sanguo.HubServer
             };
             Hub.AddRequestHandler(typeof(LoginRequest).ToString(), loginHandler);
         }
-        public void OnClientLoaded() { }
+        public void OnClientLoadedOnly()
+        {
+            throw new NotImplementedException();// this method should never be called.
+        }
+        public void OnAnyLoadedCommon()
+        {
+            throw new NotImplementedException();// this method should never be called.
+        }
     }
 }

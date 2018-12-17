@@ -1,13 +1,16 @@
 ﻿using Newtonsoft.Json;
-using Sanguo.Core.Protocol;
 using Sanguo.Core.Communication;
 using Sanguo.Core;
+using System;
+using Sanguo.Core.Protocol.Lobby;
+using Sanguo.Core.Protocol.Hub;
+using Sanguo.Core.Protocol.Common;
 
 namespace Sanguo.HubServer
 {
-    class LobbyHoster: ISanguoPlugin
+    class LobbyOnlineRequestHandler: ISanguoPlugin
     {
-        public void OnServerLoaded()
+        public void OnServerLoadedOnly()
         {
             void lobbyFreshHandler(string json, IOCPServer server, System.Net.Sockets.SocketAsyncEventArgs args)
             {
@@ -40,6 +43,15 @@ namespace Sanguo.HubServer
             }
             Hub.AddRequestHandler(typeof(AvailableLobbiesRequest).ToString(), availableLobbiesHandler);
         }
-        public void OnClientLoaded() { }
+
+        public void OnClientLoadedOnly()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void OnAnyLoadedCommon()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

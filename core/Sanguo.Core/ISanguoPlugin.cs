@@ -2,7 +2,8 @@
 {
     public interface ISanguoPlugin
     {
-        void OnServerLoaded();
-        void OnClientLoaded();
+        void OnServerLoadedOnly();
+        void OnClientLoadedOnly();
+        void OnAnyLoadedCommon();
     }
 }

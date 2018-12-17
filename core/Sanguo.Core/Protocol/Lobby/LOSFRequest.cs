@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Sanguo.Core.Protocol.Common;
 
-namespace Sanguo.Core.Protocol
+namespace Sanguo.Core.Protocol.Lobby
 {
     /// <summary> 
     /// Lobby online status refresh request.

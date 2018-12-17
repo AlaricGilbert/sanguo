@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Sanguo.Core.Communication;
+using Sanguo.Core.Protocol.Common;
 
-namespace Sanguo.Core.Protocol
+namespace Sanguo.Core.Protocol.Hub
 {
     public class AvailableLobbiesResponse:Response
     {

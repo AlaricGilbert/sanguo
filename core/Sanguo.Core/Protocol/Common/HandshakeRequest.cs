@@ -1,8 +1,6 @@
 ﻿using Newtonsoft.Json;
-using Sanguo.Core.Communication;
-using System.Net.Sockets;
 
-namespace Sanguo.Core.Protocol
+namespace Sanguo.Core.Protocol.Common
 {
     public class HandshakeRequest : Request
     {

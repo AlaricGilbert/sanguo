@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
+using Sanguo.Core.Protocol.Common;
 
-namespace Sanguo.Core.Protocol
+namespace Sanguo.Core.Protocol.Hub
 {
     public class AvailableLobbiesRequest : Request
     {

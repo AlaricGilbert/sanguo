@@ -1,10 +1,10 @@
 ﻿using Newtonsoft.Json;
 using Sanguo.Core.Communication;
-using Sanguo.Core.Protocol;
+using Sanguo.Core.Protocol.Common;
+using Sanguo.Core.Protocol.Hub;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 
 namespace Sanguo.ConsoleClient

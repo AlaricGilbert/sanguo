@@ -1,28 +1,26 @@
 ﻿using Newtonsoft.Json;
 using Sanguo.Core;
 using Sanguo.Core.Communication;
-using Sanguo.Core.Protocol;
-using System;
+using Sanguo.Core.Protocol.Lobby;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
 
 namespace Sanguo.Lobby
 {
-    public class Lobby
+    public static class Lobby
     {
         private const string HubAddr = "127.0.0.1";
         private const int HubPort = 18112;
-        public int Port { get; internal set; }
-        public int MaxClients { get; internal set; }
+        public static int Port { get; internal set; }
+        public static int MaxClients { get; internal set; }
         public delegate void RequestHandler(string jsonRequest, IOCPServer server, SocketAsyncEventArgs args);
-        private readonly Dictionary<string, RequestHandler> _lobbyRequestHandlers = new Dictionary<string, RequestHandler>();
-        public void AddRequestHandler(string requestType, RequestHandler requestHandler) => _lobbyRequestHandlers.Add(requestType, requestHandler);
-        public string LobbyAddr { get; internal set; }
-        private IOCPServer _lobbyServer;
-        private IOCPClient _hubConnecter;
-        public Lobby(int lobbyPort, int maxClients)
+        private static readonly Dictionary<string, RequestHandler> _lobbyRequestHandlers = new Dictionary<string, RequestHandler>();
+        public static void AddRequestHandler(string requestType, RequestHandler requestHandler) => _lobbyRequestHandlers.Add(requestType, requestHandler);
+        public static string LobbyAddr { get; internal set; }
+        private static IOCPServer _lobbyServer;
+        private static IOCPClient _hubConnecter;
+        public static void Init(int lobbyPort, int maxClients)
         {
             Port = lobbyPort;
             MaxClients = maxClients;
@@ -31,9 +29,8 @@ namespace Sanguo.Lobby
 
             _hubConnecter = new IOCPClient(IPAddress.Parse(HubAddr), HubPort);
         }
-        public virtual void Run()
+        public static void Run()
         {
-            AddLobbyServerHandlers();
             _lobbyServer.Init();
             _lobbyServer.Start();
 
@@ -42,11 +39,12 @@ namespace Sanguo.Lobby
 
             List<ISanguoPlugin> plugins = new List<ISanguoPlugin>
             {
-                new LobbyDataHandler()
+                new LobbyRequestsHandler()
             };
             //To do : client-side outside plugins load.
             foreach(var plug in plugins)
             {
+                plug.OnServerLoadedOnly();
             }
 
 
@@ -59,12 +57,6 @@ namespace Sanguo.Lobby
                 ServerIdentifier = "pris01"
             };
             _hubConnecter.Send(JsonConvert.SerializeObject(losf));
-
-        }
-
-        private void AddLobbyServerHandlers()
-        {
-            
         }
     }
 }

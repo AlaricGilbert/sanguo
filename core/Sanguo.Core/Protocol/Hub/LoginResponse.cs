@@ -1,4 +1,6 @@
-﻿namespace Sanguo.Core.Protocol
+﻿using Sanguo.Core.Protocol.Common;
+
+namespace Sanguo.Core.Protocol.Hub
 {
     public class LoginResponse: Response
     {
