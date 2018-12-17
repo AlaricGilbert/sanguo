@@ -5,10 +5,16 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>$(SolutionDir)artifacts</OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\core\Sanguo.Core\Sanguo.Core.csproj" />
-    <ProjectReference Include="..\..\server\Sanguo.HubServer\Sanguo.HubServer.csproj" />
-    <ProjectReference Include="..\..\server\Sanguo.Lobby\Sanguo.Lobby.csproj" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="cd $(SolutionDir)&#xD;&#xA;cd server&#xD;&#xA;cd Sanguo.HubServer&#xD;&#xA;dotnet build&#xD;&#xA;cd ..&#xD;&#xA;cd Sanguo.Lobby&#xD;&#xA;dotnet build" />
+  </Target>
 
 </Project>

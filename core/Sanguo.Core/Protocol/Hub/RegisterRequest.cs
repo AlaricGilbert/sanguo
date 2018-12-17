@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using Sanguo.Core.Protocol.Common;
 
-namespace Sanguo.Core.Protocol
+namespace Sanguo.Core.Protocol.Hub
 {
     public class RegisterRequest :Request
     {

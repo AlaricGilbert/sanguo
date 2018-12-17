@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json;
 using Sanguo.Core.Communication;
-using Sanguo.Core.Protocol;
+using Sanguo.Core.Protocol.Common;
+using Sanguo.Core.Protocol.Hub;
+using Sanguo.Core.Protocol.Lobby;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
 using System.Threading;
 
 namespace Sanguo.ConsoleClient
@@ -12,7 +13,8 @@ namespace Sanguo.ConsoleClient
     public static class Client
     {
         static IOCPClient client = new IOCPClient(IPAddress.Parse("127.0.0.1"), 18112);
-        static Dictionary<string, Action<string>> ResponseHandler = new Dictionary<string, Action<string>>(); 
+        static Dictionary<string, Action<string>> HubResponseHandler = new Dictionary<string, Action<string>>();
+        static Dictionary<string, Action<string>> LobbyResponseHandler = new Dictionary<string, Action<string>>();
         static bool waiting = true;
         static int hsErrorCount = 0;
         public static void Run()
@@ -22,7 +24,7 @@ namespace Sanguo.ConsoleClient
             {
                 string response = e.GetReceived();
                 Response r = JsonConvert.DeserializeObject<Response>(response);
-                ResponseHandler[r.ResponseType](response);
+                HubResponseHandler[r.ResponseType](response);
 
                 waiting = false;
             };
@@ -33,6 +35,7 @@ namespace Sanguo.ConsoleClient
 
         private static void addHandlers()
         {
+            #region Handshake
             void handshakeHandler(string jsonResp)
             {
                 HandshakeResponse r = JsonConvert.DeserializeObject<HandshakeResponse>(jsonResp);
@@ -53,16 +56,32 @@ namespace Sanguo.ConsoleClient
                 Thread.Sleep(1000);
                 client.Send(JsonConvert.SerializeObject(HandshakeRequest.Default));
             }
-            ResponseHandler.Add(typeof(HandshakeResponse).ToString(), handshakeHandler);
+            HubResponseHandler.Add(typeof(HandshakeResponse).ToString(), handshakeHandler);
+            #endregion
+
+            #region Log-in
             void loginHandler(string jsonResp)
             {
                 Program.logger.Write("log-ok", "Client/CommuniHandler", Core.Logger.LogLevel.Infos);
             }
-            ResponseHandler.Add(typeof(LoginResponse).ToString(), loginHandler);
+            HubResponseHandler.Add(typeof(LoginResponse).ToString(), loginHandler);
+            #endregion
+
+            void availableRoomHandler(string s)
+            {
+                AvailableRoomsResponse resp = JsonConvert.DeserializeObject<AvailableRoomsResponse>(s);
+                foreach (var item in resp.RoomInfos)
+                {
+                    Console.WriteLine(item.Identity);
+                }
+            }
+            LobbyResponseHandler.Add(typeof(AvailableRoomsResponse).ToString(), availableRoomHandler);
+            #region Available lobbies
             void availableLobbyHandler(string jsonResp)
             {
                 Program.logger.Write("lobby-got ok.", "Client/CommuniHandler", Core.Logger.LogLevel.Infos);
                 AvailableLobbiesResponse r = JsonConvert.DeserializeObject<AvailableLobbiesResponse>(jsonResp);
+                #region Connect
                 string ip = "";
                 int port = 0;
                 foreach (var item in r.LobbyInfos)
@@ -71,11 +90,24 @@ namespace Sanguo.ConsoleClient
                     port = item.Value.Port;
                     break;
                 }
-                IOCPClient client = new IOCPClient(IPAddress.Parse(ip), port);
-                client.Connect();
-                client.Listen();
+               
+                IOCPClient _client = new IOCPClient(IPAddress.Parse(ip), port);
+                _client.Connect();
+                _client.Listen();
+                #endregion
+                _client.DataReceived += (sender, e) =>
+                {
+                    string response = e.GetReceived();
+                    Response _r = JsonConvert.DeserializeObject<Response>(response);
+                    LobbyResponseHandler[_r.ResponseType](response);
+                };
+
+                _client.Send(JsonConvert.SerializeObject(AvailableRoomsRequest.Default));
+
             }
-            ResponseHandler.Add(typeof(AvailableLobbiesResponse).ToString(), availableLobbyHandler);
+            HubResponseHandler.Add(typeof(AvailableLobbiesResponse).ToString(), availableLobbyHandler);
+            #endregion
+
         }
 
         static void run()
@@ -102,6 +134,7 @@ namespace Sanguo.ConsoleClient
 #endif
             AvailableLobbiesRequest r = AvailableLobbiesRequest.Default;
             client.Send(JsonConvert.SerializeObject(r));
+            while (true) ;
         }
     }
 }

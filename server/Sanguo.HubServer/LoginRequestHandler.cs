@@ -1,17 +1,21 @@
 ﻿using Newtonsoft.Json;
-using Sanguo.Core.Protocol;
+using Sanguo.Core;
+using Sanguo.Core.Communication;
+using Sanguo.Core.Protocol.Common;
+using Sanguo.Core.Protocol.Hub;
 using System;
+using System.Net.Sockets;
 
 namespace Sanguo.HubServer
 {
-    class LoginServer : IHubPlugin
+    class LoginRequestHandler : ISanguoPlugin
     {
-        public void OnLoad()
+        public void OnServerLoadedOnly()
         {
-            Hub.RequestHandler loginHandler = async (json, server, args) =>
+            async void loginHandler(string json, IOCPServer server, SocketAsyncEventArgs args)
             {
                 LoginRequest request = JsonConvert.DeserializeObject<LoginRequest>(json);
-                if(await Hub.LoginDB.LoginAsync(request))
+                if (await Hub.LoginDB.LoginAsync(request))
                 {
                     string sessionID = Guid.NewGuid().ToString();
                     LoginResponse response = new LoginResponse
@@ -40,8 +44,16 @@ namespace Sanguo.HubServer
                     };
                     server.Send(args, JsonConvert.SerializeObject(response));
                 }
-            };
+            }
             Hub.AddRequestHandler(typeof(LoginRequest).ToString(), loginHandler);
+        }
+        public void OnClientLoadedOnly()
+        {
+            throw new NotImplementedException();// this method should never be called.
+        }
+        public void OnAnyLoadedCommon()
+        {
+            throw new NotImplementedException();// this method should never be called.
         }
     }
 }

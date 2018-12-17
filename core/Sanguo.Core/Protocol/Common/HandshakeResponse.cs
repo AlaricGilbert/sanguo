@@ -1,4 +1,4 @@
-﻿namespace Sanguo.Core.Protocol
+﻿namespace Sanguo.Core.Protocol.Common
 {
     public class HandshakeResponse:Response
     {

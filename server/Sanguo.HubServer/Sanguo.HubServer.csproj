@@ -5,12 +5,22 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\artifacts</OutputPath>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1-beta1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\core\Sanguo.Core\Sanguo.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="userdata.db">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

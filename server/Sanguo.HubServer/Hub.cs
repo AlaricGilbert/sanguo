@@ -1,7 +1,8 @@
 ﻿using Newtonsoft.Json;
 using Sanguo.Core;
 using Sanguo.Core.Communication;
-using Sanguo.Core.Protocol;
+using Sanguo.Core.Protocol.Common;
+using Sanguo.Core.Protocol.Lobby;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -46,10 +47,10 @@ namespace Sanguo.HubServer
         public static void Run()
         {
             #region Initialize hub plugs
-            List<IHubPlugin> hubPlugins = new List<IHubPlugin>
+            List<ISanguoPlugin> hubPlugins = new List<ISanguoPlugin>
             {
-                new LoginServer(),
-                new LobbyHoster()
+                new LoginRequestHandler(),
+                new OnlineLobbiesRequestHandler()
             };
             //Todo: load out-side plugins
 
@@ -66,7 +67,7 @@ namespace Sanguo.HubServer
 
             //Load all plugins.
             foreach (var plugin in hubPlugins)
-                plugin.OnLoad();
+                plugin.OnServerLoadedOnly();
             #endregion
 
             LoginDB.Open();
